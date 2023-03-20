@@ -5,84 +5,66 @@
  */
 package services;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import dataaccess.RoleDB;
+import dataaccess.UserDB;
+import java.util.List;
+import models.Role;
+import models.User;
 
 /**
  *
  * @author darkn
  */
-@WebServlet(name = "UserService", urlPatterns = {"/UserService"})
-public class UserService extends HttpServlet {
-
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet UserService</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet UserService at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
+public class UserService {
+    
+    
+    public List<User> getAll() throws Exception {
+        UserDB userDB = new UserDB();
+        List<User> users = userDB.getAll();
+        return users;
     }
-
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
+    
+    public User get(String email) throws Exception {
+        UserDB userDB = new UserDB();
+        User user = userDB.get(email);
+        return user;
     }
+    
+    public void insert(String email, String firstName, String lastName, 
+               String password, int roleId) throws Exception {        
+    
+        RoleDB roleDB = new RoleDB();
+        Role role = roleDB.get(roleId);
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
+        User user = new User(email, firstName, lastName, password);
+        user.setRole(role);
+        
+        UserDB userDB = new UserDB();
+        userDB.insert(user);
     }
+    
+    public void update(String email, String firstName, String lastName, 
+        String password, int roleId) throws Exception {
+        
+        RoleDB roleDB = new RoleDB();
+        Role role = roleDB.get(roleId);
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
+        UserDB userDB = new UserDB();
+        User user = userDB.get(email);
+
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setPassword(password);
+        user.setRole(role);
+        
+        userDB.update(user);
+    }
+    
+    public void delete(String email) throws Exception {
+        UserDB userDB = new UserDB();
+        User user = userDB.get(email);
+        userDB.delete(user);
+    }
+    
 
 }
